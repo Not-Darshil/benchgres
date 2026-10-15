@@ -1,0 +1,60 @@
+# Benchgres — two identical Postgres servers:
+#   target    (localhost:5434) — the database the agent analyzes (read-only role later)
+#   throwaway (localhost:5433) — the copy where fixes are applied and benchmarked
+# Sized for a 16 GB Mac that also runs Ollama.
+
+name: benchgres
+
+x-postgres: &postgres
+  build: ./docker/postgres
+  image: benchgres-postgres:17
+  environment:
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+  # Parallel hash joins on big tables need more than Docker's default 64 MB.
+  shm_size: 1g
+  mem_limit: 4g
+  command:
+    - postgres
+    - -c
+    - shared_preload_libraries=pg_stat_statements
+    - -c
+    - pg_stat_statements.track=all
+    - -c
+    - shared_buffers=1GB
+    - -c
+    - effective_cache_size=3GB
+    - -c
+    - work_mem=32MB
+    - -c
+    - maintenance_work_mem=512MB
+    - -c
+    - max_wal_size=4GB
+    - -c
+    - track_io_timing=on
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U postgres"]
+    interval: 5s
+    retries: 10
+  restart: unless-stopped
+
+services:
+  target:
+    <<: *postgres
+    container_name: benchgres-target
+    ports:
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - pgdata_target:/var/lib/postgresql/data
+
+  throwaway:
+    <<: *postgres
+    container_name: benchgres-throwaway
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - pgdata_throwaway:/var/lib/postgresql/data
+
+volumes:
+  pgdata_target:
+  pgdata_throwaway:

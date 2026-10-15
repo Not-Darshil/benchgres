@@ -1,0 +1,36 @@
+# Datasets: large and reproducible (see benchmark/seed/ and the README)
+databases/
+
+# Personal notes, not part of the project
+RESUME_ANALYSIS.md
+INTERVIEW_GUIDE.md
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Secrets and local config
+.env
+.env.*
+!.env.example
+
+# App storage (SQLite)
+*.db
+*.db-journal
+
+# Frontend
+node_modules/
+dist/
+
+# Benchmark output
+benchmark/results/
+
+# Editors and OS
+.vscode/
+.idea/
+.claude/settings.local.json
+.DS_Store
