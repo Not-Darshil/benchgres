@@ -26,8 +26,8 @@ __pycache__/
 node_modules/
 dist/
 
-# Benchmark output
-benchmark/results/
+# Benchmark logs (results JSON is kept)
+benchmark/results/*.log
 
 # Editors and OS
 .vscode/

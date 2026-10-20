@@ -32,6 +32,10 @@ for i in $(seq 1 22); do
     > "$OUT/queries/q$(printf '%02d' "$i").sql"
 done
 
+# DuckDB writes Q11 with the SF 1 threshold; the spec's FRACTION is 0.0001 / SF.
+FRACTION=$(awk "BEGIN { printf \"%.10f\", 0.0001 / $SF }")
+sed -i.bak "s/0\.0001000000/$FRACTION/" "$OUT/queries/q11.sql" && rm -f "$OUT/queries/q11.sql.bak"
+
 # The DuckDB file is only needed for generation.
 rm -f "$DB" "$DB.wal"
 
